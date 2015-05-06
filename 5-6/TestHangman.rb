@@ -25,5 +25,5 @@ puts "Your hint is: #{hint}"
 puts "What letter is your first guess?"
 user_guess = gets.chomp.downcase
 guesses.add(user_guess)
-guesses 
+
 

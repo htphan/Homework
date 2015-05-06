@@ -30,7 +30,7 @@ def start
     puts "What letter is your first guess?"
     user_guess = gets.chomp.downcase
     guess_set.add(user_guess)
-    guess_attempt(answer, guesses)
+    guess_attempt(answer, guess_set)
   elsif response == "n" || response == "no"
     puts "Ok... Maybe next time!"
   else
@@ -41,11 +41,11 @@ end
 
 def guess_attempt(answer, guesses)
   answer.each_char { |letter|
-    if guesses.include?(letter)
-      print "#{letter}"
-    else
-      print "_"
-    end
+      if guesses.include?(letter)
+        print "#{letter}"
+      else
+        print "_"
+      end
   }
   # if word_complete?
   #   puts "Congratulations! You have solved the answer!"
@@ -56,7 +56,7 @@ def guess_attempt(answer, guesses)
   # end
 end
 
-def 
+
 
 
 
@@ -70,7 +70,9 @@ def word_complete?(answer, guess_set)
     puts "Congratulations! You have solved the answer!"
     start
   else 
-    
+
+  end
+
 
 
   # answer.chars.to_set == guess_set
