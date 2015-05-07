@@ -42,11 +42,12 @@ def start
 
   repeat = []
 
+  rand_word_hint = word_list.to_a.sample
+  answer = rand_word_hint[0].to_s
+  hint = rand_word_hint[1]
+
   response = gets.chomp.downcase
   if response == "y" || response == "yes"
-    rand_word_hint = word_list.to_a.sample
-    answer = rand_word_hint[0].to_s
-    hint = rand_word_hint[1]
     puts "Ok, let's begin!"
     puts "#{"_" * answer.length}"
     puts "Your hint is: #{hint}"
@@ -62,23 +63,26 @@ def start
 end
 
 def guess_print(answer, guess_set, user_guess, count, repeat)
-  guess_set.add(user_guess)
-  answer.each_char { |letter|
+  unless user_guess.chars.count > 1 
+    guess_set.add(user_guess)
+    answer.each_char { |letter|
       if guess_set.include?(letter)
         print "#{letter}"
       else
         print "_"
       end
-  }
+    }
+  else
+    user_guess.chars.count > 1 
+    puts "You can only guess ONE letter!"
+    guess_next(answer, guess_set, count, repeat)
+  end
   print "\n" + "Used Letters: #{guess_set.to_a.join}"
   word_complete(answer, guess_set, user_guess, count, repeat)
 end
 
 def word_complete(answer, guess_set, user_guess, count, repeat)
-	if user_guess.chars.count > 1 
-    puts "\n" + "You can only guess ONE letter!"
-    guess_next(answer, guess_set, count, repeat)
-  elsif answer.chars.to_set.subset? guess_set
+	if answer.chars.to_set.subset? guess_set
     puts "\n" + "Congratulations! You have solved the answer!"
     puts "Would you like to try again? (y/n)"
     start
