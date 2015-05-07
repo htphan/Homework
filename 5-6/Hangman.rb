@@ -76,26 +76,26 @@ def guess_print(answer, guess_set, user_guess, count, repeat)
     puts "You can only guess ONE letter!"
     guess_next(answer, guess_set, count, repeat)
   end
-  print "\n" + "Used Letters: #{guess_set.to_a.join}"
+  print "\nUsed Letters: #{guess_set.to_a.join}"
   word_complete(answer, guess_set, user_guess, count, repeat)
 end
 
 def word_complete(answer, guess_set, user_guess, count, repeat)
 	if answer.chars.to_set.subset? guess_set
-    puts "\n" + "Congratulations! You have solved the answer!"
+    puts "\nCongratulations! You have solved the answer!"
     puts "Would you like to try again? (y/n)"
     start
   elsif repeat.include?(user_guess)
-    puts "\n" + "You already guessed the letter #{user_guess}!"
+    puts "\nYou already guessed the letter #{user_guess}!"
     guess_next(answer, guess_set, count, repeat)
   elsif  answer.chars.to_a.include?(user_guess)
-    puts "\n" + "Remaining guesses: #{count}"
+    puts "\nRemaining guesses: #{count}"
     repeat << user_guess
     guess_next(answer, guess_set, count, repeat)
   else
     repeat << user_guess
     count -= 1 
-    puts "\n" + "Remaining guesses: #{count}"
+    puts "\nRemaining guesses: #{count}"
     unless count == 0
       guess_next(answer, guess_set, count, repeat)
     else
