@@ -72,8 +72,7 @@ def guess_print(answer, guess_set, user_guess, count, repeat)
         print "_"
       end
     }
-  else
-    user_guess.chars.count > 1 
+  else 
     puts "You can only guess ONE letter!"
     guess_next(answer, guess_set, count, repeat)
   end
