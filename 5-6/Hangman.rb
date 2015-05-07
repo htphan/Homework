@@ -1,24 +1,49 @@
-## Hangman
+## Hangman Game
 
 require 'pry'
 require 'set'
 
+puts "Would you like to play a Hangman game? (y/n)"
+
 def start
   word_list = {
-  corgi: "Dog Breed",
-  robin: "Bird",
-  apple: "Fruit",
-  hawaii: "Place",
-  computer: "Thing",
-  ferrari: "Car",
-  bacon: "food",
-  }
+    corgi: "Animal",
+    robin: "Animal",
+    apple: "Food",
+    hawaii: "Place",
+    computer: "Thing",
+    ferrari: "Transportation",
+    bacon: "Food",
+    yacht: "Transportation",
+    train: "Transportation",
+    tagolog: "Language",
+    german: "Language",
+    basketball: "Sport",
+    football: "Sport",
+    tennis: "Sport",
+    spaghetti: "Food",
+    sandwich: "Food",
+    germany: "Place",
+    luxembourg: "Place",
+    television: "Thing",
+    baseball: "Sport",
+    table: "Thing",
+    mailbox: "Thing",
+    january: "Month",
+    december: "Month",
+    august: "Month",
+    france: "Place",
+    market: "Place",
+    buffalo: "Animal",
+    quokka: "Animal",
+    }
 
-  turn_count = 7
+  count = 7
 
   guess_set = Set.new
 
-  puts "Whould you like to play a Hangman game? (y/n)"
+  repeat = []
+
   response = gets.chomp.downcase
   if response == "y" || response == "yes"
     rand_word_hint = word_list.to_a.sample
@@ -29,54 +54,65 @@ def start
     puts "Your hint is: #{hint}"
     puts "What letter is your first guess?"
     user_guess = gets.chomp.downcase
-    guess_set.add(user_guess)
-    guess_attempt(answer, guess_set)
+    # guess_set.add(user_guess)
+    guess_print(answer, guess_set, user_guess, count, repeat)
+    # word_complete(answer, guess_set)
   elsif response == "n" || response == "no"
     puts "Ok... Maybe next time!"
   else
-    puts "I'm sorry, your input was not recognized."
-    ## recursion
+    puts "I'm sorry, your input was not recognized. Please type 'yes' or 'no'."
+    start
   end
 end
 
-def guess_attempt(answer, guesses)
+def guess_print(answer, guess_set, user_guess, count, repeat)
+  guess_set.add(user_guess)
   answer.each_char { |letter|
-      if guesses.include?(letter)
+      if guess_set.include?(letter)
         print "#{letter}"
       else
         print "_"
       end
   }
-  # if word_complete?
-  #   puts "Congratulations! You have solved the answer!"
-  #   start
-  # else
-  #   turn_count -= 1
-
-  # end
+  print "\n" + "Used Letters: #{guess_set.to_a.join}"
+  word_complete(answer, guess_set, user_guess, count, repeat)
 end
 
+def word_complete(answer, guess_set, user_guess, count, repeat)
+	if user_guess.chars.count > 1 
+    puts "\n" + "You can only guess ONE letter!"
+    guess_next(answer, guess_set, count, repeat)
 
-
-
-
-# answer.chars.to_set == guess_set
-#       puts "Congratulations! You have solved the answer!"
-#       start
-
-
-def word_complete?(answer, guess_set)
-	if answer.chars.to_set == guess_set
-    puts "Congratulations! You have solved the answer!"
+  elsif answer.chars.to_set.subset? guess_set
+    puts "\n" + "Congratulations! You have solved the answer!"
+    puts "Would you like to try again? (y/n)"
     start
-  else 
-
+  elsif  answer.chars.to_a.include?(user_guess)
+    puts "\n" + "Remaining guesses: #{count}"
+    repeat << user_guess
+    guess_next(answer, guess_set, count, repeat)
+  elsif repeat.include?(user_guess)
+    puts "\n" + "You already guessed the letter #{user_guess}!"
+    guess_next(answer, guess_set, count, repeat)
+  else
+    repeat << user_guess
+    count -= 1 
+    puts "\n" + "Remaining guesses: #{count}"
+    unless count == 0
+      guess_next(answer, guess_set, count, repeat)
+    else
+      puts "You ran out of guesses!"
+      puts "The answer was '#{answer}'"
+      puts "Would you like to try again? (y/n)"
+      start
+    end
   end
-
-
-
-  # answer.chars.to_set == guess_set
 end
 
-binding.pry
+def guess_next(answer, guess_set, count, repeat)
+  puts "What is your next guess?"
+  next_guess = gets.chomp.downcase
+  guess_print(answer, guess_set, next_guess, count, repeat)
+end
 
+start
