@@ -21,6 +21,19 @@
 require 'pry'
 require 'set'
 
+Place_hash = {
+1 => [0, 0],
+2 => [0, 1],
+3 => [0, 2],
+4 => [1, 0],
+5 => [1, 1],
+6 => [1, 2],
+7 => [2, 0],
+8 => [2, 1],
+9 => [2, 2]
+}
+
+
 def start
   puts "Welcome to Tic-Tac-Toe!"
   puts "**Playing Modes**"
@@ -120,30 +133,33 @@ def normal_start(placement, turn_count, p1_past, opp_past)
 end
 
 # The function verify_i verfies if the user's input is an integer between 1 and 9
-def verify_i(u_place)
-  until (1..9).include?(u_place)
+
+def verify_i(place)
+  until (1..9).include?(place)
     puts "I'm sorry, your input was not recognized."
     puts "Where would you like to make your move? (1 - 9)"
-    u_place = gets.chomp.to_i
+    place = gets.chomp.to_i
+  end
+  true
+end
+
+def verify_avail(placement, place, turn_count, p1_past, opp_past)
+  place_arr = Place_hash[place]
+  place_value = placement[place_arr[0]][place_arr[1]]
+  used_spot = ["X", "O"]
+  if used_spot.include?(place_value)
+    puts "This spot has been taken already!"
+    p1_move(placement, turn_count, p1_past, opp_past)
   end
   true
 end
 
 def find_replace(placement, place, turn_count, p1_past, opp_past)
-  place_hash = {
-    1 => [0, 0],
-    2 => [0, 1],
-    3 => [0, 2],
-    4 => [1, 0],
-    5 => [1, 1],
-    6 => [1, 2],
-    7 => [2, 0],
-    8 => [2, 1],
-    9 => [2, 2]
-  }
-  place_arr = place_hash[place]
-  place_loc = placement[place_arr[0]][place_arr[1]]
-  used_spot = ["X", "O"]
+  place_arr = Place_hash[place]
+  # used_spot = ["X", "O"]
+
+
+
   # first_a = nil     # index of the first array that includes u_place
   # second_a = nil    # index of the second array that include u_place
   # placement.each_index { |e|
@@ -152,29 +168,36 @@ def find_replace(placement, place, turn_count, p1_past, opp_past)
   #       second_a = placement[e].index(place)
   #     end
   # }
-  if used_spot.include?(placement[place_arr[0]][place_arr[1]])
-    puts "This spot has been taken already!"
-    p1_move(placement, turn_count, p1_past, opp_past)
-  else
-    if turn_count % 2 == 0
-      placement[place_arr[0]][place_arr[1]] = "X"
-      if is_complete?(p1_past, opp_past)
-        print_board(placement)
-        puts "Congratulations! You Won!"
+
+
+
+  # if used_spot.include?(place_value)
+  #   puts "This spot has been taken already!"
+  #   p1_move(placement, turn_count, p1_past, opp_past)
+  if turn_count % 2 == 0
+    placement[place_arr[0]][place_arr[1]] = "X"
+    if is_complete?(p1_past, opp_past)
+      print_board(placement)
+      puts "Congratulations! You Won!"
+      play_again?
+    else
+      if tie?(p1_past, opp_past) 
         play_again?
-      else 
-        tie?(p1_past, opp_past)
+      else  
         turn_count += 1
         cpu_move(placement, turn_count, p1_past, opp_past)
       end
+    end
+  else
+    placement[place_arr[0]][place_arr[1]] = "O"
+    if is_complete?(p1_past, opp_past)
+      print_board(placement)
+      puts "You Lost!"
+      play_again?
     else
-      placement[place_arr[0]][place_arr[1]] = "O"
-      if is_complete?(p1_past, opp_past)
-        print_board(placement)
-        puts "You Lost!"
+      if tie?(p1_past, opp_past) 
         play_again?
-      else
-        tie?(p1_past, opp_past)
+      else  
         turn_count += 1
         p1_move(placement, turn_count, p1_past, opp_past)
       end
@@ -186,8 +209,10 @@ def p1_move(placement, turn_count, p1_past, opp_past)
   print_board(placement)
   puts "Where would you like to make your move? (1 - 9)"
   u_place = gets.chomp.to_i
-  if verify_i(u_place)
+  if verify_i(u_place) && verify_avail(placement, u_place, turn_count, p1_past, opp_past)
     p1_past << u_place
+    find_replace(placement, u_place, turn_count, p1_past, opp_past)
+  else
     find_replace(placement, u_place, turn_count, p1_past, opp_past)
   end
 end
@@ -197,14 +222,18 @@ def cpu_move(placement, turn_count, p1_past, cpu_past)
   remaining_spots = []
   placement.each_index { |x| 
     placement[x].each_index { |y| 
-      unless placement[x][y] == "X"
+      unless placement[x][y] == "X" || placement[x][y] == "O"
         remaining_spots.push(placement[x][y])
       end
     }
   }
   cpu_place = remaining_spots.sample
-  cpu_past << cpu_place
-  find_replace(placement, cpu_place, turn_count, p1_past, cpu_past)
+  if verify_i(cpu_place) && verify_avail(placement, cpu_place, turn_count, p1_past, cpu_past)
+    cpu_past << cpu_place
+    find_replace(placement, cpu_place, turn_count, p1_past, cpu_past)
+  else
+    find_replace(placement, cpu_place, turn_count, p1_past, cpu_past)
+  end
 end
 
 # Each set in the function is_complete? is a possible winning combination
@@ -230,9 +259,11 @@ def tie?(p1_past, opp_past)
 # Incase of a TIE
   all_moves = (1..9).to_set
   completed_moves = p1_past + opp_past
-  if all_moves == completed_moves.to_set
+  if all_moves.subset?(completed_moves.to_set)
     puts "It's a TIE!"
-    play_again?
+    return true
+  else
+    return false
   end
 end
 
@@ -244,19 +275,15 @@ def play_again?
     puts "Would you like to play again? (Y/N)"
     decision = gets.chomp.downcase
   end
-  unless decision == "n" || decision == "no"
-    start
-  else
+  if decision == "n" || decision == "no"
     puts "Thank you for playing!"
+  else
+    start
   end
 end
 
 start
 
-
-
-##### bash is showing winning message when winning combo is not completed
-##### line 145 undef method on nil []
 
 
 
