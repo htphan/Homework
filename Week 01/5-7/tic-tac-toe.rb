@@ -110,8 +110,10 @@ def difficulty_mode
     normal_start(placement, turn_count, p1_past, opp_past, gametype)
   elsif d_mode == "2" || d_mode == "hard"
     puts "This feature is currently not available" 
+    start
   else d_mode == "3" || d_mode == "death"
     puts "This feature is currently not available" 
+    start
   end 
 end
 
