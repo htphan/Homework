@@ -116,7 +116,7 @@ def print_board(placement)
   tb_row_all = [" "*7 + "|", " "*7 + "|"," "*7]
 # This will be the bottom rows for the first and second top subsections
   bottom_row12 = ["_"*7 + "|", "_"*7 + "|", "_"*7]
-# This will be the bottom row for the third(last) subsection
+# This will be the bottom row for the third(last) bottom subsection
   bottom_row_3 = [" "*7 + "|", " "*7 + "|", " "*7]
 
   puts tb_row_all.join
@@ -147,10 +147,7 @@ def playing_mode(p_mode)
 end
 
 def difficulty_mode
-  puts "**Difficulty**"
-  puts "1: Normal"
-  puts "2: Hard"
-  puts "3: Death"
+  puts "**Difficulty** \n1: Normal \n2: Hard \n3: Death"
   puts "Please select your difficulty (1, 2, or 3):"
   d_mode = gets.chomp.downcase
   until ["1", "2", "3", "normal", "hard", "death"].include?(d_mode)
