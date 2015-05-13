@@ -4,7 +4,7 @@ class Human
   def initialize(name)
     @name = name
     @alert = 0
-    @coffee_avail = "no"
+    @coffee = nil
   end
 
   def alertness
@@ -12,20 +12,19 @@ class Human
   end
 
   def has_coffee?
-    @coffee_avail == "yes"
+    @coffee =~ /\w/
   end
 
   def needs_coffee?
-    @coffee_avail == "no"
+    @coffee == nil
   end
 
   def buy(coffee)
-    @coffee_avail = "yes"
-    @coffee_new = coffee
+    @coffee = coffee
   end
 
   def drink!
     @alert += 0.33
-    @coffee_new.drink_coffee
+    @coffee.drink_coffee
   end
 end
