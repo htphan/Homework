@@ -47,7 +47,6 @@ module IronYardGames
    
     def initialize
       @deck = get_cards
-      shuffle
     end
 
     def get_cards
