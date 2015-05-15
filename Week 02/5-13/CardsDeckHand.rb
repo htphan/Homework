@@ -44,6 +44,7 @@ module IronYardGames
   end
 
   class Deck
+    include Enumerable
    
     def initialize
       @deck = get_cards
