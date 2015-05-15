@@ -8,8 +8,8 @@ class Cpu
     @piece
   end
 
-  def select_placement
-    @move = (1..9).to_a
-    @move.sample - 1
+  def select_placement(available)
+    @move = available.sample
+    @move = @move - 1
   end
 end

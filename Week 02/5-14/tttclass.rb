@@ -73,6 +73,7 @@ class TicTacToe
     end
   end
 
+protected
   def win?
     WIN_COMBOS.any? { |x, y, z|
       @board.current_board[x] == @board.current_board[y] && @board.current_board[y] == @board.current_board[z]
@@ -100,10 +101,10 @@ class TicTacToe
 
   def choose_move(player)
     @available = @board.available_blocks
-    @move = player.select_placement
+    @move = player.select_placement(@available)
     until @available.include?(@move+1)
       puts "Your input was not recognized, please try again:"
-      @move = player.select_placement
+      @move = player.select_placement(@available)
     end
     @move
   end

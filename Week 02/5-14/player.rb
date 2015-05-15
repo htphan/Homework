@@ -7,10 +7,10 @@ class Player
     @piece
   end
 
-  def select_placement
+  def select_placement(available)
     puts "Where would you like to move? (1-9)"
     @move = gets.chomp.to_i
-    until (1..9).to_a.include?(@move)
+    until available.include?(@move)
       puts "Your input was not recognized."
       puts "Please select a number between 1 and 9:"
       @move = gets.chomp.to_i
