@@ -17,7 +17,7 @@ class CpuTest < MiniTest::Test
     cpu = Cpu.new("X")
     available = (1..9).to_a
     guess = cpu.select_placement(available)
-    assert available.include?(guess)
+    assert available.include?(guess.to_i)
   end
 end
 
@@ -31,7 +31,7 @@ class PlayerTest < MiniTest::Test
     player = Player.new("X")
     available = (1..9).to_a
     guess = player.select_placement(available)
-    assert available.include?(guess)
+    assert available.include?(guess.to_i)
   end
 end
 
