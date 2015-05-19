@@ -1,7 +1,7 @@
-require './tttclass'
+require './game'
 
 def start
-  game = TicTacToe.new
+  game = Game.new
   game.playing_mode
   game.start
   play_again?

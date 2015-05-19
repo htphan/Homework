@@ -1,22 +1,15 @@
 require 'pry'
+require 'set'
 require './board'
 require './player'
 require './cpu'
 
-class TicTacToe
-
-  WIN_COMBOS = [[0,1,2], [3,4,5], [6,7,8],
-                [0,3,6], [1,4,7], [2,5,8],
-                [6,4,2], [0,4,8]]
-
+class Game
+  attr_reader :board, :win_combos, :player1, :player2, :move
   def initialize
-    # @score = [] implement the score it another file
-    @chosen_blocks = []
+    # @score = [] to implement the score in another file
     @board = Board.new
-    @current_player = nil
-    @player1 = nil
-    @player2 = nil
-
+    @win_combos = @board.win_combos
   end
 
   def playing_mode
@@ -33,18 +26,17 @@ class TicTacToe
       p_mode = gets.chomp
     end
     if p_mode == "1"
-      @piece1 = choose_piece
-      @player1 = Player.new(@piece1)
-      avail_piece = ["X", "O"].reject { |x| x == @piece1}
+      piece = choose_piece
+      @player1 = Player.new(piece)
+      avail_piece = ["X", "O"].reject { |x| x == piece}
       @player2 = Cpu.new(avail_piece[0])
     elsif p_mode == "2"
-      @piece1 = choose_piece
-      @player1 = Player.new(@piece1)
-      avail_piece = ["X", "O"].reject { |x| x == @piece1}
+      piece = choose_piece
+      @player1 = Player.new(piece)
+      avail_piece = ["X", "O"].reject { |x| x == piece}
       @player2 = Player.new(avail_piece[0])
     else
-      @piece1 = "X"
-      @player1 = Cpu.new(@piece1)
+      @player1 = Cpu.new("X")
       @player2 = Cpu.new("O")
     end 
     p_mode  
@@ -57,46 +49,59 @@ class TicTacToe
     puts "To choose your placements, input the corresponding"\
       "\nnumber with your desired placement!"\
       "\n(ex: 1 for the top left corner)"
+    gameplay
+  end
+
+  def gameplay
     until complete?
       @board.show_board     
-      puts "It's #{@current_player.current_piece}'s turn!"
+      puts "It's #{@current_player.piece}'s turn!"
       @move = choose_move(@current_player)
-      replace_board
+      @board.replace_block(@move, @current_player.piece)
       @current_player = @current_player == @player1 ? @player2 : @player1
     end
     @board.show_board 
     if win? 
-      win_msg = find_winner == "X" ? "'X' is the Winner!" : "'O' is the Winner!"
-      puts win_msg
+      find_winner
     else
       puts "It's a draw!"
     end
   end
 
-protected
   def win?
-    WIN_COMBOS.any? { |x, y, z|
-      @board.current_board[x] == @board.current_board[y] && @board.current_board[y] == @board.current_board[z]
-    }
+    @p1_win = @win_combos.map do |x|
+      x.to_set.subset?(@player1.past_moves)
+    end
+    @p2_win = @win_combos.map do |x|
+      x.to_set.subset?(@player2.past_moves)
+    end
+    @p1_win.include?(true) || @p2_win.include?(true)
   end
 
   def find_winner
-    index = WIN_COMBOS.find_index { |x, y, z|
-      @board.current_board[x] == @board.current_board[y] && @board.current_board[y] == @board.current_board[z]
-    }
-    @board.current_board[WIN_COMBOS[index][0]]
+    if @p1_win.include?(true)
+      if @player1.class == Player 
+        puts "Player1('#{@player1.piece}') is the Winner!"
+      else
+        puts "The CPU('#{@player1.piece}') is the Winner!"
+      end
+    else
+      if @player2.class == Cpu && @player1.class == Player
+        puts "You Lost! The CPU('#{@player2.piece}') beat you!"
+      elsif @player2.class == Player
+        puts "Player2('#{@player2.piece}') is the Winner!"
+      else
+        puts "The CPU('#{@player2.piece}') is the Winner!"
+      end
+    end
   end
 
   def draw?
-    @board.current_board.all? { |x| x.is_a? String }
+    @board.board.all? { |x| x.is_a? String }
   end
 
   def complete?
     win? || draw?
-  end
-
-  def replace_board
-    @board.replace_block(@move, @current_player.current_piece)
   end
 
   def choose_move(player)
@@ -106,18 +111,19 @@ protected
       puts "Your input was not recognized, please try again:"
       @move = player.select_placement(@available)
     end
+    player.add_past_moves(@move)
     @move
   end
 
   def choose_piece
     puts "Player 1: What piece would you like to be? (X or O)"
-    @piece1 = gets.chomp.upcase 
-    until @piece1 =~ /^[xo]$/i
+    piece = gets.chomp.upcase 
+    until piece =~ /^[xo]$/i
       puts "Your input was not recognized."
       puts "Please select 'X' or 'O':" 
-      @piece1 = gets.chomp.upcase
+      piece = gets.chomp.upcase
     end
-    @piece1
+    piece
   end
 end
 
